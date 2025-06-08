@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>コーヒーメーカーUI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="coffee-machine">
+    <div class="display-panel">
+      <div class="display-message" id="displayMessage">
+        コーヒーをセットして<br>カップの種類の<br>ボタンを押してください
+      </div>
+      <div class="display-cups">
+        <div class="cup-icon"></div>
+        <div class="cup-icon"></div>
+      </div>
+      <div class="strength-buttons" id="strengthButtons" style="display:none; margin-top:18px;">
+        <button class="strength-btn" data-strength="light"></button>
+        <button class="strength-btn" data-strength="medium"></button>
+        <button class="strength-btn" data-strength="dark"></button>
+      </div>
+    </div>
+    <div class="menu-section hot-coffee">
+      <div class="menu-label">HOT<br>COFFEE</div>
+      <div class="menu-cups">
+        <button class="menu-btn small" data-menu="hot-coffee-small"><span class="cup-icon filled small"></span></button>
+        <button class="menu-btn" data-menu="hot-coffee-large"><span class="cup-icon filled"></span></button>
+      </div>
+      <div class="menu-indicators strength-select" id="hotCoffeeStrength" style="display:none;">
+        <button class="indicator-btn indicator light" data-strength="light"></button>
+        <button class="indicator-btn indicator medium" data-strength="medium"></button>
+        <button class="indicator-btn indicator dark" data-strength="dark"></button>
+      </div>
+      <div class="menu-indicators" id="hotCoffeeIndicators">
+        <span class="indicator light"></span>
+        <span class="indicator medium"></span>
+        <span class="indicator dark"></span>
+      </div>
+    </div>
+    <div class="menu-section ice-coffee">
+      <div class="menu-label">ICE<br>COFFEE</div>
+      <div class="menu-cups">
+        <button class="menu-btn small" data-menu="ice-coffee-small"><span class="cup-icon filled small"></span></button>
+        <button class="menu-btn" data-menu="ice-coffee-large"><span class="cup-icon filled"></span></button>
+      </div>
+      <div class="menu-indicators strength-select" id="iceCoffeeStrength" style="display:none;">
+        <button class="indicator-btn indicator light" data-strength="light"></button>
+        <button class="indicator-btn indicator medium" data-strength="medium"></button>
+        <button class="indicator-btn indicator dark" data-strength="dark"></button>
+      </div>
+      <div class="menu-indicators" id="iceCoffeeIndicators">
+        <span class="indicator light"></span>
+        <span class="indicator medium"></span>
+        <span class="indicator dark"></span>
+      </div>
+    </div>
+    <div class="menu-section hot-latte">
+      <div class="menu-label">HOT<br>CAFE LATTE</div>
+      <div class="menu-cups">
+        <button class="menu-btn small" data-menu="hot-latte-small"><span class="cup-icon filled small"></span></button>
+        <button class="menu-btn" data-menu="hot-latte-large"><span class="cup-icon filled"></span></button>
+      </div>
+    </div>
+    <div class="menu-section ice-latte">
+      <div class="menu-label">ICE<br>CAFE LATTE</div>
+      <div class="menu-cups">
+        <button class="menu-btn small" data-menu="ice-latte-small"><span class="cup-icon filled small"></span></button>
+        <button class="menu-btn" data-menu="ice-latte-large"><span class="cup-icon filled"></span></button>
+      </div>
+    </div>
+  </div>
+  <script>
+    const menuBtns = document.querySelectorAll('.menu-btn');
+    const displayMessage = document.getElementById('displayMessage');
+    const displayCups = document.querySelector('.display-cups');
+    const hotCoffeeStrength = document.getElementById('hotCoffeeStrength');
+    const iceCoffeeStrength = document.getElementById('iceCoffeeStrength');
+    const hotCoffeeIndicators = document.getElementById('hotCoffeeIndicators');
+    const iceCoffeeIndicators = document.getElementById('iceCoffeeIndicators');
+    let resetTimeout = null;
+
+    menuBtns.forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const menu = btn.getAttribute('data-menu');
+        if(menu && (menu.startsWith('hot-latte') || menu.startsWith('ice-latte'))){
+          // カフェラテは濃さ選択なしで即抽出
+          displayMessage.innerHTML = '抽出中...';
+          displayCups.style.display = 'none';
+          hotCoffeeStrength.style.display = 'none';
+          iceCoffeeStrength.style.display = 'none';
+          hotCoffeeIndicators.style.display = 'flex';
+          iceCoffeeIndicators.style.display = 'flex';
+          setTimeout(() => {
+            displayMessage.innerHTML = '抽出完了';
+            setTimeout(() => {
+              displayMessage.innerHTML = 'コーヒーをセットして<br>カップの種類の<br>ボタンを押してください';
+              displayCups.style.display = 'flex';
+              hotCoffeeIndicators.style.display = 'flex';
+              iceCoffeeIndicators.style.display = 'flex';
+            }, 1500);
+          }, 3000);
+        } else {
+          displayMessage.innerHTML = '濃さを選んでください';
+          displayCups.style.display = 'none';
+          // 濃さ選択ボタン表示
+          if(menu && menu.startsWith('hot-coffee')) {
+            hotCoffeeStrength.style.display = 'flex';
+            hotCoffeeIndicators.style.display = 'none';
+            iceCoffeeStrength.style.display = 'none';
+            iceCoffeeIndicators.style.display = 'flex';
+          } else if(menu && menu.startsWith('ice-coffee')) {
+            iceCoffeeStrength.style.display = 'flex';
+            iceCoffeeIndicators.style.display = 'none';
+            hotCoffeeStrength.style.display = 'none';
+            hotCoffeeIndicators.style.display = 'flex';
+          } else {
+            hotCoffeeStrength.style.display = 'none';
+            iceCoffeeStrength.style.display = 'none';
+            hotCoffeeIndicators.style.display = 'flex';
+            iceCoffeeIndicators.style.display = 'flex';
+          }
+        }
+      });
+    });
+
+    document.querySelectorAll('.strength-select .indicator-btn').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        displayMessage.innerHTML = '抽出中...';
+        // hotCoffeeStrength.style.display = 'none';
+        // iceCoffeeStrength.style.display = 'none';
+        // 濃さボタンを消さずにそのまま表示
+        resetTimeout = setTimeout(() => {
+          displayMessage.innerHTML = '抽出完了';
+          setTimeout(() => {
+            displayMessage.innerHTML = 'コーヒーをセットして<br>カップの種類の<br>ボタンを押してください';
+            displayCups.style.display = 'flex';
+            hotCoffeeIndicators.style.display = 'flex';
+            iceCoffeeIndicators.style.display = 'flex';
+            hotCoffeeStrength.style.display = 'none';
+            iceCoffeeStrength.style.display = 'none';
+          }, 1500);
+        }, 3000);
+      });
+    });
+  </script>
+</body>
+</html>
